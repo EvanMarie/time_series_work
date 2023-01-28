@@ -7,6 +7,8 @@ figure.titleweight : bold
 figure.edgecolor :  cyan
 
 font.monospace : monospace
+font.size: 15
+text.color : white
 
 axes.facecolor : 1E3A4C
 axes.edgecolor : LightGray
@@ -33,16 +35,16 @@ xtick.labelsize : 12
 ytick.labelcolor : white
 ytick.labelsize : 12
 
-lines.color : C0
+lines.color : C1
 lines.linewidth : 2.5
-lines.markersize : 9
+lines.markersize : 7
 lines.markeredgewidth : 0.3
 lines.markeredgecolor : white
 scatter.marker : o
 
 legend.facecolor : 333333
 legend.shadow : True
-legend.fontsize : 13
+legend.fontsize : 15
 legend.fancybox : True
 legend.labelcolor : white
 legend.edgecolor : white

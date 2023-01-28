@@ -6,8 +6,12 @@ import matplotlib.pyplot as plt
 
 pd.options.display.float_format = '{:,.2f}'.format
 
-bgcolor = '#142733';
-text_color = 'white'
+pretty_label_text = 'black'
+pretty_label_background = '#E1C7C2'
+pretty_background = '#DBE5EB'
+pretty_text = 'black'
+bgcolor = "#E1C7C2";
+text_color = 'black'
 innerbackcolor = "#1E3A4C";
 outerbackcolor = "#142733";
 fontcolor = "white"
@@ -59,32 +63,75 @@ def p(x): print(x); sp()
 
 def d(x): display(x); sp()
 
-def pretty(input, label=None, fontsize=3, bgcolor=bgcolor,
-           textcolor="white", width=None
-           ):
+# .......................Complementary Colors....................................... #
+def get_complementary(color):
+    color = color[1:]
+    color = int(color, 16)
+    comp_color = 0xFFFFFF ^ color
+    comp_color = "#%06X" % comp_color
+    return comp_color
+
+# .......................Pretty....................................... #
+
+def pretty(data, label=None, fontsize=3,
+            bgcolor=pretty_background,
+            textcolor=pretty_text, width=None
+            ):
     from IPython.display import HTML
-    input = str(input)
+    import numpy as np
 
-    def get_color(color):
-        label_font = [x - 3 for x in [int(num) for num in color[1:]]]
-        label_font = "#" + "".join(str(x) for x in label_font)
-        return label_font
+    if isinstance(data, np.ndarray):
+        data = list(data)
 
-    if label != None:
-        label_font = get_color(bgcolor)
-        pretty(label, fontsize=fontsize, bgcolor='#ececec',
-               textcolor=label_font, width=width, label=None)
+    if label:
+        output_df = pd.DataFrame([label, data])
+    else:
+        output_df = pd.DataFrame([[data]])
 
-    display(HTML("<span style = 'line-height: 2; \
-                                background: {}; width: {}; \
-                                border: 1px solid text_color;\
-                                border-radius: 0px; text-align: center;\
-                                padding: 5px;'>\
-                                <b><font size={}><text style=color:{}>{}\
-                                </text></font></b></style>".format(bgcolor, width,
-                                                                   fontsize,
-                                                                   textcolor, input)))
+    if label:
+        df_styler = (
+            [{'selector': '.row0',
+              'props': [('background-color', pretty_label_background),
+                        ('color', pretty_label_text),
+                        ('font-size', '15px'),
+                        ('font-weight', 550),
+                        ('text-align', 'left'),
+                        ('padding', '3px 5px 3px 5px')]},
+             {'selector': '.row1',
+              'props': [('background-color', pretty_background),
+                        ('color', pretty_text),
+                        ('font-size', '15px'),
+                        ('font-weight', 'bold'),
+                        ('text-align', 'left'),
+                        ('padding', '3px 5px 5px 5px')]},
+             {'selector': 'tbody',
+              'props': [('border', '1px solid'),
+                        ('border-color', 'black')]},
+             {'selector': 'tr',
+              'props': [('border', '0.8px solid'),
+                        ('border-color', 'black')]}])
+    else:
+        df_styler = (
+            [{'selector': '.row0',
+              'props': [('background-color', pretty_background),
+                        ('color', pretty_text),
+                        ('font-size', '15px'),
+                        ('font-weight', 'bold'),
+                        ('text-align', 'left'),
+                        ('padding', '3px 2px 5px 5px')]},
+             {'selector': 'tbody',
+              'props': [('border', '1px solid'),
+                        ('border-color', 'black')]},
+             {'selector': 'tr',
+              'props': [('border', '0.8px solid'),
+                        ('border-color', 'black')]}])
 
+    display(output_df.style.hide(axis='index') \
+            .hide(axis='columns') \
+            .set_table_styles(df_styler))
+    sp()
+
+# .......................Div Print....................................... #
 def div_print(text, width='auto', bgcolor=bgcolor, text_color=text_color,
               fontsize=2
               ):
@@ -508,95 +555,40 @@ def boxplot_correlation(df, feature_x, feature_y, order=None, palette=None):
     plt.title(f'Feature Correlation: {x_name.capitalize()} - {y_name.capitalize()}',
               fontsize=20, pad=20, color='white');
 
+# **************************** Get Daily Error ********************************** #
+def get_daily_error(df, actual_col, pred_col, num_examples,
+                    ascending=False
+                    ):
+    temp = df[[actual_col, pred_col]].copy()
+    temp['date'] = temp.index.strftime('%A, %b %d, %Y')
+    temp['error'] = np.abs(df[actual_col] - df[pred_col])
 
+    results = temp.sort_values("error", ascending=ascending)
 
-# ****************************IPYWIDGETS Functions********************************** #
-# ****************************MINI-PLOT********************************** #
-def mini_plot(df, title, ylabel=None, xlabel=None, cmap='cool', kind='line',
-              label_rot=None, logy=False, legend_loc=2
-              ):
-    mpl.rcParams['xtick.color'] = text_color
-    mpl.rcParams['ytick.color'] = text_color
-    mpl.rcParams['font.family'] = 'monospace'
-    fig, ax1 = plt.subplots(figsize=(13, 7), facecolor=outerbackcolor)
+    error_style = {'error': [{'selector': '',
+                              'props': [('color', 'red'),
+                                        ('font-weight', 'bold'),
+                                        ('padding-right', '15px'),
+                                        ('padding-left', '15px')]}],
+                   'date': [{'selector': 'td',
+                             'props': [('color', 'blue'),
+                                       ('font-weight', 'bold'),
+                                       ('padding-right', '15px'),
+                                       ('padding-left', '15px')]}],
+                   'prediction': [{'selector': 'td',
+                                   'props': [('padding-right', '25px'),
+                                             ('padding-left', '15px')]}]}
 
-    if kind == 'line':
-        df.plot(kind='line', ax=ax1, rot=label_rot, cmap=cmap, logy=logy)
+    if ascending == True:
+        pretty(f'Daily error for the {num_examples} days with the lowest error:',
+               fontsize=4)
     else:
-        df.plot(ax=ax1, kind=kind, rot=label_rot, cmap=cmap, logy=logy)
-    plt.title(title, color=text_color, size=20, pad=20)
-    ax1.grid(color='LightGray', linestyle=':', linewidth=0.5, which='major', axis='both')
+        pretty(f'Daily error for the {num_examples} days with the highest error:',
+               fontsize=4)
 
-    plt.xticks()
-    ax1.set_ylabel(ylabel, color=text_color)
-    ax1.set_xlabel(xlabel, color=text_color)
-    plt.style.use("ggplot");
-    ax1.set_facecolor(innerbackcolor)
-    if legend_loc is None:
-        ax.get_legend().remove()
-    else:
-        plt.legend(labels=df.columns, fontsize=15, loc=legend_loc,
-                   facecolor=outerbackcolor, labelcolor=text_color)
-    plt.show()
-
-# ****************************PLOT-BY-DF********************************** #
-
-def plot_by_df(df, sort_param, title, fontsize = 4, num_records=12,
-               ylabel=None, xlabel=None, cmap='cool', kind='line',
-               label_rot=None, logy=False, legend_loc=2, precision=2,
-               thousands=",", intraday=False):
-    import numpy as np
-    import pandas as pd
-    import matplotlib.pyplot as plt
-    import ipywidgets as widgets
-    from ipywidgets import GridspecLayout
-
-    if not intraday:
-        df = time_stamp_converter(df.copy())
-        if df.index.dtype.name.startswith('datetime64'):
-            df.index = df.index.strftime('%Y-%m-%d')
-        elif isinstance(df.index[0], pd._libs.tslibs.timestamps.Timestamp):
-            df.index = df.index.strftime('%Y-%m-%d')
-
-    out_box1 = widgets.Output(layout={"border": "1px solid black"})
-    out_box2 = widgets.Output(layout={"border": "1px solid black"})
-
-    heading_properties = [('font-size', '11px')]
-    cell_properties = [('font-size', '11px')]
-
-    dfstyle = [dict(selector="th", props=heading_properties), \
-               dict(selector="td", props=cell_properties)]
-
-    with out_box1:
-        display(date_only(df.sample(num_records).sort_values(sort_param)).style \
-                .format(precision=precision, thousands=thousands) \
-                .set_table_styles(dfstyle))
-
-    with out_box2:
-        mini_plot(df, title, ylabel=ylabel, xlabel=xlabel, cmap=cmap, kind=kind,
-                  label_rot=label_rot, logy=logy, legend_loc=legend_loc)
-
-    grid = GridspecLayout(20, 8)
-    grid[:, 0] = out_box1
-    grid[:, 1:20] = out_box2
-    # div_print(f"{title} ({num_records} samples & overall plot)", fontsize=fontsize)
-    # display(grid)
-
-
-# *************************MULTI-PLOT-By-DF************************************* #
-# MUST PASS list of lists to this function
-# [[df, title], [df, title], [df, title], [df, title]]
-
-def multi_plot_by_df(data_list, title, xlabel=None, ylabel=None,
-                     legend_loc=2, cmap='cool', num_records=12,
-                     sort_param=None, fontsize=3, precision=2, thousands=","):
-
-    div_print(title, fontsize=5)
-
-    for pair in data_list:
-        plot_by_df(pair[0], title=pair[1], xlabel=xlabel, fontsize=fontsize,
-                   ylabel=ylabel, legend_loc=legend_loc, cmap=cmap,
-                   num_records=num_records, sort_param=sort_param,
-                   precision=precision, thousands=thousands);sp();
-
-    sp(); sp();
+    return results[['date',
+                    'error',
+                    pred_col,
+                    actual_col]].head(num_examples).style.hide(axis='index') \
+        .set_table_styles(error_style) \
+        .format(precision=3, thousands=",")

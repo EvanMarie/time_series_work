@@ -1,0 +1,14 @@
+name: sktime-pydata
+channels:
+  - conda-forge
+  - defaults
+  - anaconda
+dependencies:
+  - python=3.8
+  - pip
+  - sktime-all-extras=0.8.1
+  - statsmodels=0.12.1
+  - pip:
+      - pmdarima
+      - esig
+prefix: /Users/mloning/.conda/envs/sktime-pydata

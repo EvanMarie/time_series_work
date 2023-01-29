@@ -1,6 +1,6 @@
 axes.prop_cycle : (cycler('color', ['FC69FF', '00F3F7', 'FFA500', '55FA35', 'FFFE37', 'DED6F9']) + cycler('linestyle', ['-', '--', ':', '-.', (0, (3, 1, 1, 1, 1, 1)), (0, (3, 1, 1, 1))]))
 
-figure.figsize : 13, 7
+figure.figsize : 8, 5
 figure.facecolor : 142733
 figure.titlesize : 22
 figure.titleweight : bold
@@ -14,11 +14,11 @@ axes.facecolor : 1E3A4C
 axes.edgecolor : LightGray
 axes.titlecolor : white
 axes.titlepad : 20
-axes.titlesize : 22
+axes.titlesize : 19
 axes.grid : True
 axes.grid.axis : both
 axes.grid.which : both
-axes.labelsize : 17
+axes.labelsize : 13
 axes.labelcolor : white
 axes.labelpad : 10
 axes.xmargin: 0.01
@@ -31,9 +31,9 @@ grid.alpha: 1
 
 xtick.color : white
 xtick.labelcolor : white
-xtick.labelsize : 12
+xtick.labelsize : 10
 ytick.labelcolor : white
-ytick.labelsize : 12
+ytick.labelsize : 10
 
 lines.color : C1
 lines.linewidth : 2.5

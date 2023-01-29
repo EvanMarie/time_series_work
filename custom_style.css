@@ -1,0 +1,26 @@
+<style>
+
+a:link {
+    color: #1E3A4C !important;
+    font-weight: 600 !important;
+}
+
+/* visited link */
+a:visited {
+    color: #1E3A4C !important;
+    font-weight: 600 !important;
+}
+
+/* mouse over link */
+a:hover {
+    color: #1E3A4C !important;
+    font-weight: 600 !important;
+}
+
+/* selected link */
+a:active {
+    color: #1E3A4C !important;
+    font-weight: 600 !important;
+}
+
+</style>

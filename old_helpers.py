@@ -6,32 +6,22 @@ import matplotlib.pyplot as plt
 
 pd.options.display.float_format = '{:,.2f}'.format
 
-# DEFINE PROJECT COLORS --------------------------------------#
-very_dark = "#142733"
-medium_dark = "#1E3A4C"
-light_main = '#DBE5EB'
-light_complementary = '#E1C7C2'
-dark_font_color = 'black'
-light_font_color = 'white'
-
-# Assigning colors to project variables -----------------------#
-pretty_label_text = dark_font_color
-pretty_label_background = light_complementary
-pretty_background = light_main
-pretty_text = dark_font_color
-bgcolor = light_main
-text_color = dark_font_color
-innerbackcolor = medium_dark
-outerbackcolor = very_dark
-fontcolor = light_font_color
+pretty_label_text = 'black'
+pretty_label_background = '#E1C7C2'
+pretty_background = '#DBE5EB'
+pretty_text = 'black'
+bgcolor = "#E1C7C2";
+text_color = 'black'
+innerbackcolor = "#1E3A4C";
+outerbackcolor = "#142733";
+fontcolor = "white"
 
 favorite_cmaps = ['cool', 'autumn', 'autumn_r', 'Set2_r', 'cool_r',
                   'gist_rainbow', 'prism', 'rainbow', 'spring']
 
-def css_styling():
-    from IPython.core.display import HTML
-    styles = open("custom_style.css", "r").read()
-    return HTML(styles)
+
+# FUNCTIONS: d, p, sp, table_of_contents, display_me, sample_df, see,
+#	     list_to_table, div_print, overview, missing_values, fancy_plot
 
 # .......................IMPORTS....................................... #
 def pd_np_mpl_import():
@@ -83,7 +73,7 @@ def get_complementary(color):
 
 # .......................Pretty....................................... #
 
-def pretty(data, label=None, fontsize='15px',
+def pretty(data, label=None, fontsize=3,
             bgcolor=pretty_background,
             textcolor=pretty_text, width=None
             ):
@@ -103,14 +93,14 @@ def pretty(data, label=None, fontsize='15px',
             [{'selector': '.row0',
               'props': [('background-color', pretty_label_background),
                         ('color', pretty_label_text),
-                        ('font-size', fontsize),
+                        ('font-size', '15px'),
                         ('font-weight', 550),
                         ('text-align', 'left'),
                         ('padding', '3px 5px 3px 5px')]},
              {'selector': '.row1',
               'props': [('background-color', pretty_background),
                         ('color', pretty_text),
-                        ('font-size', fontsize),
+                        ('font-size', '15px'),
                         ('font-weight', 'bold'),
                         ('text-align', 'left'),
                         ('padding', '3px 5px 5px 5px')]},
@@ -141,54 +131,42 @@ def pretty(data, label=None, fontsize='15px',
             .set_table_styles(df_styler))
     sp()
 
-# .......................header_text....................................... #
+# .......................Div Print....................................... #
+def div_print(text, width='auto', bgcolor=bgcolor, text_color=text_color,
+              fontsize=2
+              ):
+    from IPython.display import HTML as html_print
 
-def header_text(text, width=None, bgcolor=bgcolor, text_color=text_color,
-                fontsize='15px'
-                ):
-    from IPython.display import HTML
-
-    if not width:
-        font_height = int(fontsize[:-2])
-        width = font_height * 25
-        width = str(width) + "px"
+    if width == 'auto':
+        font_calc = {6: 2.75, 5: 2.5, 4: 2.5, 3: 3, 2: 4}
+        width = str(len(text) * fontsize * font_calc[fontsize]) + "px"
 
     else:
         if type(width) != str:
             width = str(width)
         if width[-1] == "x":
             width = width
-        else:
-            width = str(width) + "px"
+        elif width[-1] != '%':
+            width = width + "px"
 
-    df_styler = (
-        [{'selector': 'tr',
-          'props': [('background-color', bgcolor),
-                    ('color', text_color),
-                    ('font-size', fontsize),
-                    ('font-weight', '550'),
-                    ('text-align', 'left'),
-                    ('padding', '3px 30px 3px 50px')]},
-         {'selector': 'td',
-          'props': [('padding', '5px 10px 5px 10px'),
-                    ('width', width),
-                    ('text-align', 'center')]}])
-
-    out_df = pd.DataFrame([text]).style.hide(axis='index') \
-        .hide(axis='columns') \
-        .set_table_styles(df_styler)
-
-    return display(HTML('<center>' + out_df.to_html()))
+    return display(html_print("<span style = 'display: block; width: {}; \
+						line-height: 2; background: {};\
+						margin-left: auto; margin-right: auto;\
+						border: 1px solid text_color;\
+						border-radius: 3px; text-align: center;\
+						padding: 3px 8px 3px 8px;'>\
+						<b><font size={}><text style=color:{}>{}\
+						</text></font></b></style>".format(width, bgcolor,
+                                                           fontsize,
+                                                           text_color, text)))
 
 # .......................DESCRIBE_EM....................................... #
-def describe_em(df, col_list, title = None, fontsize = '15px'):
-    df_list = []
-    if title:
-        header_text(title, fontsize = fontsize)
-    for column in col_list:
-        df_tuple = (df[column].describe(), 'df.' + column)
-        df_list.append(df_tuple)
-    multi(df_list)
+def describe_em(df, col_list):
+	df_list = []
+	for column in col_list:
+		df_tuple = (df[column].describe(), 'df.' + column)
+		df_list.append(df_tuple)
+	multi(df_list)
 
 
 # .......................Time Stamp Converter....................................... #
@@ -225,7 +203,7 @@ def time_stamp_converter(df):
 
 # .......................DISPLAY_ME........................................ #
 def head_tail_vert(df, num, title, bgcolor=bgcolor,
-                    text_color=text_color, fontsize='18px',
+                    text_color=text_color, fontsize=4,
                     intraday=False):
     from IPython.core.display import HTML
 
@@ -243,18 +221,18 @@ def head_tail_vert(df, num, title, bgcolor=bgcolor,
     tail_data = "<center>" + df.tail(num).to_html()
 
     print("")
-    header_text(f'{title}: head({num})', fontsize=fontsize,
+    div_print(f'{title}: head({num})', fontsize=fontsize,
               bgcolor=bgcolor, text_color=text_color)
     display(HTML(head_data))
     print("")
-    header_text(f'{title}: tail({num})', fontsize=fontsize,
+    div_print(f'{title}: tail({num})', fontsize=fontsize,
               bgcolor=bgcolor, text_color=text_color)
     display(HTML(tail_data))
     print("")
 
 def head_tail_horz(df, num, title, bgcolor=bgcolor,
                    text_color=text_color, precision=2,
-                   intraday=False, title_fontsize='18px',
+                   intraday=False, title_fontsize=4,
                    table_fontsize="12px"):
 
     if type(df) != pd.core.frame.DataFrame:
@@ -267,7 +245,7 @@ def head_tail_horz(df, num, title, bgcolor=bgcolor,
         elif isinstance(df.index[0], pd._libs.tslibs.timestamps.Timestamp):
             df.index = df.index.strftime('%Y-%m-%d')
 
-    header_text(f'{title}', fontsize=title_fontsize,
+    div_print(f'{title}', fontsize=title_fontsize,
               bgcolor=bgcolor, text_color=text_color)
     multi([(df.head(num),f"head({num})"),
            (df.tail(num),f"tail({num})")],
@@ -276,12 +254,12 @@ def head_tail_horz(df, num, title, bgcolor=bgcolor,
 
 # .......................SEE....................................... #
 
-def see(data, title=None, width="auto", fontsize='18px',
+def see(data, title=None, width="auto", fontsize=4,
         bgcolor=bgcolor, text_color=text_color,
         intraday=False):
 
     if title != None:
-        header_text(f"{title}", fontsize=fontsize, width=width,
+        div_print(f"{title}", fontsize=fontsize, width=width,
                   bgcolor=bgcolor, text_color=text_color)
 
     if isinstance(data, pd.core.frame.DataFrame):
@@ -335,7 +313,7 @@ def force_df(data, intraday=False):
         try:
             return pd.Series(data).to_frame()
         except:
-            return header_text("The data cannot be displayed.", fontsize='18px')
+            return div_print("The data cannot be displayed.")
 
 # .......................MULTI....................................... #
 
@@ -380,11 +358,33 @@ def multi(data_list, fontsize='15px', precision=2, intraday=False):
         display_html('<center>' + stylers[0]._repr_html_() + spaces + stylers[1]._repr_html_() + spaces + stylers[
             2]._repr_html_() + spaces + stylers[3]._repr_html_() + spaces, raw=True); sp();
 
+# .......................LIST_TO_TABLE....................................... #
 
+def list_to_table(display_list, num_cols, title, width="auto",
+                  bgcolor=bgcolor, text_color=text_color
+                  ):
+    div_print(f"{title}", fontsize=4, width=width,
+              bgcolor=bgcolor, text_color=text_color)
+
+    count = 0
+    current = '<center><table><tr>'
+    length = len(display_list)
+    num_rows = round(length / num_cols) + 1
+
+    for h in range(num_rows):
+        for i in range(num_cols):
+            try:
+                current += ('<td>' + display_list[count] + '</td>')
+            except IndexError:
+                current += '<td>' + ' ' + '</td>'
+            count += 1
+        current += '</tr><tr>'
+    current += '</tr></table></center>'
+    display(HTML(current))
 
 # .......................MISSING_VALUES....................................... #
 
-def missing_values(df, bgcolor=bgcolor, text_color=text_color, fontsize='18px'):
+def missing_values(df, bgcolor=bgcolor, text_color=text_color):
     from IPython.display import HTML
     pd.options.display.float_format = '{:,.0f}'.format
     missing_log = []
@@ -392,7 +392,7 @@ def missing_values(df, bgcolor=bgcolor, text_color=text_color, fontsize='18px'):
         missing_values = df[column].isna().sum()
         missing_log.append([column, missing_values])
     missing = pd.DataFrame(missing_log, columns=['column name', 'missing'])
-    header_text(f'Columns and Missing Values', fontsize=fontsize,
+    div_print(f'Columns and Missing Values', fontsize=3, width="38%",
               bgcolor=bgcolor, text_color=text_color)
     missing = "<center>" + missing.to_html()
     display(HTML(missing))
@@ -439,46 +439,7 @@ def fancy_plot(data, kind="line", title=None, legend_loc='upper right',
 
 # ************************************************************************** #
 # ****************************TIME SERIES ********************************** #
-def timeseries_overview(df, metric_col):
-    index_col = ['total records', 'start date', 'end date', 'total columns',
-                 'column labels', 'total missing values', f'{metric_col} average',
-                 f'{metric_col} std', f'{metric_col} min', f'{metric_col} 25%',
-                 f'{metric_col} 50%', f'{metric_col} 75%', f'{metric_col} max', ]
 
-    num_records, num_cols = df.shape
-    missing_values = df.isna().sum().sum()
-    columns = ', '.join(list(df.columns))
-    start_date = min(df.index).strftime('%m/%d/%Y')
-    end_date = max(df.index).strftime('%m/%d/%Y')
-    [metric_average, metric_std, metric_min, metric_25th,
-     metric_50th, metric_75th, metric_max] = df.describe().iloc[1:][metric_col]
-
-    values = [num_records, start_date, end_date, num_cols, columns, missing_values,
-              metric_average, metric_std, metric_min, metric_25th, metric_50th,
-              metric_75th, metric_max]
-
-    overview = pd.concat([pd.Series(index_col), pd.Series(values)], axis=1)
-    overview.columns = [' ', 'measurement'];
-    overview.set_index(' ')
-
-    styling = {'measurement': [{'selector': '',
-                                'props': [('font-size', '15px'),
-                                          ('text-align', 'left'),
-                                          ('padding-right', '15px'),
-                                          ('padding-left', '55px')]}],
-               ' ': [{'selector': '',
-                      'props': [('font-weight', 'bold'),
-                                ('text-align', 'left'),
-                                ('font-size', '15px'),
-                                ('padding-right', '15px'),
-                                ('padding-left', '15px')]}]}
-
-    pretty(f'DataFrame Overview  |  Primary Metric: {metric_col}', fontsize='18px')
-
-    return overview.style \
-        .hide(axis='index') \
-        .set_table_styles(styling) \
-        .format(precision=0, thousands=",")
 
 # ****************************Featurize Datetime Index********************************** #
 def featurize_datetime_index(df, daytime=True):
@@ -565,10 +526,10 @@ def get_accuracy(df, pred_col, actual_col):
     rmse = np.sqrt(mean_squared_error(df[actual_col],
                                       df[pred_col]))
 
-    header_text(f"Average RMSE: {rmse:,.2f}  |  Average sharpe ratio: {df['sharpe'].mean():.2f} ", fontsize='18px')
-    header_text(
+    div_print(f"Average RMSE: {rmse:,.2f}  |  Average sharpe ratio: {df['sharpe'].mean():.2f} ", fontsize=3)
+    div_print(
         f"Average absolute accuracy: {df['abs_acc'].mean():.2f}%  |  Average relative accuracy: {df['rel_acc'].mean():.2f}% ",
-        fontsize='18px')
+        fontsize=3)
 
     return df
 
@@ -620,10 +581,10 @@ def get_daily_error(df, actual_col, pred_col, num_examples,
 
     if ascending == True:
         pretty(f'Daily error for the {num_examples} days with the lowest error:',
-               fontsize='18px')
+               fontsize=4)
     else:
         pretty(f'Daily error for the {num_examples} days with the highest error:',
-               fontsize='18px')
+               fontsize=4)
 
     return results[['date',
                     'error',

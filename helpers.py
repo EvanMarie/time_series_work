@@ -66,6 +66,11 @@ def import_all():
 
 
 # ......................TINY_GUYS....................................... #
+def ser(x):
+    return pd.Series(x)
+
+def df_it(x):
+    return pd.DataFrame(x)
 
 def sp(): print('');
 
@@ -435,6 +440,96 @@ def fancy_plot(data, kind="line", title=None, legend_loc='upper right',
     else:
         plt.legend(labels=data.columns, fontsize=15, loc=legend_loc,
                    facecolor=outerbackcolor, labelcolor=fontcolor)
+
+
+# ............................Table Styling....................................... #
+def get_stylers(styles_dictionary):
+    df_stylers = []
+
+    # Takes style dictionary such as the following
+    # and converts to a styling that can be used with
+    # set_table_styles in pandas
+
+    # stylings = {'tr': [('background-color', 'red'),
+    # 			         ('color', 'yellow')],
+    # 	          'tbody': [('border', '1px'),
+    # 	                    ('border-color', 'black')]}
+
+    for style, styling in styles_dictionary.items():
+        styler = {'selector': '', 'props': []}
+        styler['selector'] = style
+        styler['props'] = styling
+        df_stylers.append(styler)
+
+    return df_stylers
+
+def df_style_string(df_name):
+	return f"{df_name}.style.hide(axis = 'index').hide(axis = 'columns').set_table_styles(df_stylers)"
+
+# ............................Style DataFrame....................................... #
+def style_df(df,
+             styles_dictionary,
+             hide_index=True,
+             hide_columns=True,
+             precision=2,
+             thousands=','
+             ):
+    df_stylers = get_stylers(styles_dictionary)
+    formatting  = {precision:precision,
+                   thousands:thousands}
+
+    if hide_index == False & hide_columns == False:
+        return df.set_table_styles(df_stylers).format(precision = precision,
+                                                      thousands = thousands)
+    elif hide_index & hide_columns:
+        return df.style.hide(axis='index') \
+            .hide(axis='columns') \
+            .set_table_styles(df_stylers).format(precision = precision,
+                                                      thousands = thousands)
+    elif hide_index:
+        return df.style.hide(axis='index') \
+            .set_table_styles(df_stylers).format(precision = precision,
+                                                 thousands = thousands)
+    else:
+        return df.style.hide(axis='columns') \
+            .set_table_styles(df_stylers).format(precision = precision,
+                                                 thousands = thousands)
+
+
+# ............................FANCY_STYLES_DF....................................... #
+def fancy_styles_df(df,
+                    background_gradient = False,
+                    bars = False,
+                    highlight_max = False,
+                    highlight_min = False,
+                    highlight_null = False,
+                    highlight_between = False,
+                    highlight_quantile = False,
+                    ):
+    if background_gradient:
+        return df.style.background_gradient(**kwargs)
+    elif bars:
+        return df.style.bar(**kwargs)
+    elif highlight_max:
+        return df.style.highlight_max(**kwargs)
+    elif highlight_min:
+        return df.style.highlight_min(**kwargs)
+    elif highlight_null:
+        return df.style.highlight_null(**kwargs)
+    elif highlight_between:
+        return df.style.highlight_between(**kwargs)
+    elif highlight_quantile:
+        return df.style.highlight_quantile(**kwargs)
+    else:
+        return df.style
+
+
+
+
+# ............................APPLY STYLE....................................... #
+def apply_style(df, style_function, **kwargs):
+    return df.style.apply(style_function, **kwargs)
+
 
 
 # ************************************************************************** #

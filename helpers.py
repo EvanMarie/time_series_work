@@ -4,6 +4,11 @@ import matplotlib as mpl
 from IPython.core.display import HTML
 import matplotlib.pyplot as plt
 
+# STARTUP SETTINGS --------------------------------------------#
+# from helpers import *
+# plt.style.use('dark_blue_greens.mplstyle')
+# css_styling()
+
 pd.options.display.float_format = '{:,.2f}'.format
 
 # DEFINE PROJECT COLORS --------------------------------------#
@@ -27,6 +32,7 @@ fontcolor = light_font_color
 
 favorite_cmaps = ['cool', 'autumn', 'autumn_r', 'Set2_r', 'cool_r',
                   'gist_rainbow', 'prism', 'rainbow', 'spring']
+
 
 def css_styling():
     from IPython.core.display import HTML
@@ -62,14 +68,13 @@ def yf_import():
 def import_all():
     pd_np_mpl_import()
     url_import()
-    yf_import()
 
 
 # ......................TINY_GUYS....................................... #
 def ser(x):
     return pd.Series(x)
 
-def df_it(x):
+def dfme(x):
     return pd.DataFrame(x)
 
 def sp(): print('');
@@ -111,14 +116,14 @@ def pretty(data, label=None, fontsize='15px',
                         ('font-size', fontsize),
                         ('font-weight', 550),
                         ('text-align', 'left'),
-                        ('padding', '3px 5px 3px 5px')]},
+                        ('padding', '3px 10px 3px 10px')]},
              {'selector': '.row1',
               'props': [('background-color', pretty_background),
                         ('color', pretty_text),
                         ('font-size', fontsize),
                         ('font-weight', 'bold'),
                         ('text-align', 'left'),
-                        ('padding', '3px 5px 5px 5px')]},
+                        ('padding', '3px 10px 3px 10px')]},
              {'selector': 'tbody',
               'props': [('border', '1px solid'),
                         ('border-color', 'black')]},
@@ -201,7 +206,6 @@ def describe_em(df, col_list, title = None, fontsize = '15px'):
 # to date, hour, and min only
 # Find columns that dtype is timestamp
 def time_stamp_converter(df):
-
     def find_datetime(df):
         datetime_cols = []
 
@@ -495,9 +499,8 @@ def style_df(df,
             .set_table_styles(df_stylers).format(precision = precision,
                                                  thousands = thousands)
 
-
 # ............................FANCY_STYLES_DF....................................... #
-def fancy_styles_df(df,
+def fancy_style_df(df,
                     background_gradient = False,
                     bars = False,
                     highlight_max = False,
@@ -505,7 +508,7 @@ def fancy_styles_df(df,
                     highlight_null = False,
                     highlight_between = False,
                     highlight_quantile = False,
-                    ):
+                    **kwargs):
     if background_gradient:
         return df.style.background_gradient(**kwargs)
     elif bars:
@@ -528,7 +531,7 @@ def fancy_styles_df(df,
 
 # ............................APPLY STYLE....................................... #
 def apply_style(df, style_function, **kwargs):
-    return df.style.apply(style_function, **kwargs)
+    return df.style.applymap(style_function, **kwargs)
 
 
 
@@ -576,7 +579,7 @@ def timeseries_overview(df, metric_col):
         .format(precision=0, thousands=",")
 
 # ****************************Featurize Datetime Index********************************** #
-def featurize_datetime_index(df, daytime=True):
+def featurize_dt_index(df, daytime=True):
     '''
     Create time series features based on a datetime index
     '''
@@ -610,8 +613,7 @@ def featurize_datetime_index(df, daytime=True):
             else:
                 return 'night'
 
-                df['time_of_day'] = (df['hour'].apply(time_of_day)).astype('category')
-
+        df['time_of_day'] = (df['hour'].apply(time_of_day)).astype('category')
         df['weekday_name'] = df['weekday_name'].astype('category')
         df['month_name'] = df['month_name'].astype('category')
         df['week_of_year'] = df.week_of_year.astype(float)
@@ -630,7 +632,7 @@ def add_change_column(df, column_changing, new_col_name):
 
 
 # ****************************Add Year Lags ********************************** #
-def year_lags(df, target_column, lag_label_list):
+def add_lags(df, target_column, lag_label_list):
     target_map = df[target_column].to_dict()
     inputs = lag_label_list.copy()
 
@@ -669,7 +671,8 @@ def get_accuracy(df, pred_col, actual_col):
 
 # **************************** BoxPlot Correlation ********************************** #
 def boxplot_correlation(df, feature_x, feature_y, order=None, palette=None):
-    fig, ax = plt.subplots(figsize=(13, 7), facecolor='outerbackcolor')
+    import seaborn as sns
+    fig, ax = plt.subplots(figsize=(13, 7), facecolor=outerbackcolor)
     ax.set_facecolor(innerbackcolor)
 
     sns.boxplot(data=df,
@@ -690,7 +693,7 @@ def boxplot_correlation(df, feature_x, feature_y, order=None, palette=None):
               fontsize=20, pad=20, color='white');
 
 # **************************** Get Daily Error ********************************** #
-def get_daily_error(df, actual_col, pred_col, num_examples,
+def get_daily_error(df, pred_col, actual_col, num_examples,
                     ascending=False
                     ):
     temp = df[[actual_col, pred_col]].copy()
